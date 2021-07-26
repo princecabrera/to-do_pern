@@ -1,17 +1,24 @@
 const express = require('express');
 const app = express();
 const cors = require('cors');
-const pool = require("./db")
+const pool = require("./db");
+const path = require('path');
 
 // Middleware
 app.use(cors());
 app.use(express.json());
 
 // Global variables
-const PORT = 7000
+const PORT = process.env.PORT || 7000;
+// process.env.NODE_ENV 
 
-// Routes
 
+if ( process.env.NODE_ENV === 'production' ){
+// Server Static Content
+    app.use(express.static(path.join(__dirname, 'client/build')))
+}
+
+// ********* Routes *********
 // CREATE a todo
 app.post("/todos", async (req, res) => {
     try {
@@ -70,6 +77,9 @@ app.delete("/todos/:id", async( req, res) => {
     }
 })
 
+app.get("*", (req, res) => {
+    res.sendFile(path.join(__dirname, 'client/build/index.html'))
+})
 
 app.listen(PORT, () => {
     console.log(`server has started listening on port ${PORT}`);
